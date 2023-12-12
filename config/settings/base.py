@@ -52,15 +52,12 @@ INSTALLED_APPS = [
     "corsheaders",
     "drf_spectacular",
     "django_filters",
-    "notifications",
     "django_celery_beat",
-    "mathfilters",
-    "django_simple_tags",
     # Local apps
     "authentication.apps.AuthenticationConfig",
     "api.apps.ApiConfig",
     "notification.apps.NotificationConfig",
-    "emails.apps.EmailConfig",
+    "scheduler.apps.SchedulerConfig",
 ]
 
 AUTH_USER_MODEL = "authentication.User"
@@ -241,6 +238,9 @@ CELERY_TIMEZONE = TIME_ZONE
 # Django-Celery-Beat settings
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
+CELERY_IMPORTS = ("scheduler.app.tasks",)
+
+# Redis cache settings
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",

@@ -1,8 +1,4 @@
-# Email service with Django, Celery, RabbitMQ and Redis
-
-![Send Email Workflow](./doc/assets/img/email.png)
-
-This document describes how to set up an e-mail service using Django, Celery, RabbitMQ and Redis. 
+# Scheduler
 
 ## Introduction
 
@@ -15,6 +11,7 @@ This document describes how to set up an e-mail service using Django, Celery, Ra
 - RabbitMQ** is an open source message broker that provides a robust platform for routing messages between processes and applications.
 
 - Redis** is an in-memory database that can be used as a results backend for Celery.
+
 ## Installation
 
 Make sure you install the necessary dependencies:
@@ -70,7 +67,28 @@ for example in a Views :
 send_mail.delay(...)
 ```
 
-See the `emails/` application
+See the `scheduler/` application
+
+
+### Scheduling
+
+Use the `CrontabSchedule` template from `django-celery-beat` to define when a task should run. For example, to run a task every day at 9:00 am:
+
+```python
+from django_celery_beat.models import PeriodicTask, CrontabSchedule
+
+schedule, _ = CrontabSchedule.objects.get_or_create(
+    hour=9,
+    minute=0,
+)
+
+PeriodicTask.objects.create(
+    crontab=schedule,
+    name="Send email every day at 9:00 AM",
+    task="myapp.tasks.send_email",
+    args=json.dumps(["Subject", "Message", "from@example.com", ["to@example.com"]]),
+)
+```
 
 ## Running
 
