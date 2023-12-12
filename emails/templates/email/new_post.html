@@ -1,0 +1,27 @@
+{% load mathfilters %}
+{% load static %}
+{% load django_simple_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <p>Hi {{ name }},</p>
+    <p>
+      Thank you for registering for our newsletter. 
+    </p>
+    <footer>
+        <div style="text-align: center">
+          <img
+            src="{% get_setting 'BASE_URL' %}{% static 'email/imgs/free.png' %}"
+            alt=""
+            height="60" />
+        </div>
+      </section>
+    </footer>
+  </body>
+</html>

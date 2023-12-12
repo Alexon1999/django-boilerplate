@@ -28,6 +28,52 @@ services:
     networks:
       - boilerplate_staging_network
 
+  celery:
+    build: .
+    env_file:
+      - ./.env.staging
+    volumes:
+      - .:/home/app
+    command: celery -A config worker --loglevel=info
+    depends_on:
+      - db
+      - rabbitmq
+      - redis
+    networks:
+      - boilerplate_staging_network
+
+  celery-beat:
+    build: .
+    env_file:
+      - ./.env.staging
+    volumes:
+      - .:/home/app
+    command: celery -A config beat --loglevel=info
+    depends_on:
+      - db
+      - rabbitmq
+      - redis
+    networks:
+      - boilerplate_staging_network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - boilerplate_staging_network
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    networks:
+      - boilerplate_staging_network
+
 volumes:
   static_volume:
   media_volume:
