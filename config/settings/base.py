@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     # Local apps
     "authentication.apps.AuthenticationConfig",
     "api.apps.ApiConfig",
-    "notification.apps.NotificationConfig",
     "scheduler.apps.SchedulerConfig",
 ]
 
