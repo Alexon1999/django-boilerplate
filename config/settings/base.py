@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "drf_spectacular",
     "django_filters",
+    "notifications",
 
     # Local apps
     "authentication.apps.AuthenticationConfig",
