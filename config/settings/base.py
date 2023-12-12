@@ -241,6 +241,7 @@ CELERY_TIMEZONE = TIME_ZONE
 # Django-Celery-Beat settings
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
+# Redis cache settings
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
