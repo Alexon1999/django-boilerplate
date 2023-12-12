@@ -7,7 +7,7 @@ max-line-length = 88
 extend-ignore =
     # See https://github.com/PyCQA/pycodestyle/issues/373
     # flake8/pycodechecker give false positives on black code
-    E203,
+    E203, D100, D101, D102, D103, D104, D107
 
 # Most of our test cases deliberately violate style checks:
 per-file-ignores =

@@ -42,7 +42,7 @@ repos:
             "flake8-black",
             "pydocstyle>=5.0.0",
           ]
-        exclude: "(tests/|doc/)"
+        exclude: "(tests/|doc/|migrations/)"
   - repo: https://github.com/asottile/blacken-docs
     rev: 1.16.0
     hooks:

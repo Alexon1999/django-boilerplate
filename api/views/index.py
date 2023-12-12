@@ -1,7 +1,8 @@
 import logging
+
 from django.http import HttpResponse
 
-logger = logging.getLogger('django')
+logger = logging.getLogger("django")
 
 # Create your views here.
 

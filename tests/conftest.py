@@ -1,6 +1,7 @@
+from datetime import datetime
+
 import pytest
 from django.utils import timezone
-from datetime import datetime
 
 
 @pytest.fixture(autouse=True)
