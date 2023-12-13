@@ -12,7 +12,7 @@ class TestCreateNotificationView(APIView):
         NotificationService.send_notification(
             sender=request.user,
             recipient=request.user,
-            verb='test',
-            description='This is a test notification'
+            verb="test",
+            description="This is a test notification",
         )
         return Response(status=status.HTTP_200_OK)

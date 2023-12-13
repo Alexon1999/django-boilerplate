@@ -8,10 +8,9 @@ app_name = "api"
 
 urlpatterns = [
     path("index", views_index.index, name="index"),
-    path("test-create-notification/",
-         test_create_notification_views.TestCreateNotificationView.as_view(
-         ),
-         name="test_create_notification"
-         ),
-
+    path(
+        "test-create-notification/",
+        test_create_notification_views.TestCreateNotificationView.as_view(),
+        name="test_create_notification",
+    ),
 ]

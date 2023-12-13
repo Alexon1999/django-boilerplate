@@ -8,15 +8,14 @@ logger = logging.getLogger("django")
 
 
 class NotificationConsumer(AsyncWebsocketConsumer):
-
     async def connect(self):
         logger.info("Connecting to websocket")
         # Parse the query string
-        query_string = self.scope['query_string'].decode('utf-8')
+        query_string = self.scope["query_string"].decode("utf-8")
         parameters = parse_qs(query_string)
 
         # Extract the token
-        token = parameters.get('token')
+        token = parameters.get("token")
 
         if not token:
             # Handle cases where token is not provided
@@ -31,13 +30,10 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
         # Check if a user was returned, indicating a successful authentication
         if user:
-            self.scope['user'] = user
+            self.scope["user"] = user
             self.group_name = f"notification_{self.scope['user'].id}"
             # Join the group
-            await self.channel_layer.group_add(
-                self.group_name,
-                self.channel_name
-            )
+            await self.channel_layer.group_add(self.group_name, self.channel_name)
 
             await self.accept()
         else:
@@ -45,11 +41,8 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         """Leave the group when the socket disconnects."""
-        if hasattr(self, 'group_name'):
-            await self.channel_layer.group_discard(
-                self.group_name,
-                self.channel_name
-            )
+        if hasattr(self, "group_name"):
+            await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
     # This will handle messages sent from the server to the consumer
     async def receive(self, text_data):
@@ -60,7 +53,11 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     async def notification_message(self, event):
         """Receive a message from the group."""
         # Send the message to the WebSocket
-        await self.send(text_data=json.dumps({
-            'type': event['type'],
-            'data': event['data'],
-        }))
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": event["type"],
+                    "data": event["data"],
+                }
+            )
+        )

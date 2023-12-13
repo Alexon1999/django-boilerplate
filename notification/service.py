@@ -6,9 +6,10 @@ from notification.serializers import NotificationSerializer
 
 
 class NotificationService:
-
     @staticmethod
-    def send_notification(sender, recipient, verb, description=None, action_object=None, target=None):
+    def send_notification(
+        sender, recipient, verb, description=None, action_object=None, target=None
+    ):
         """
         Send a notification to a user.
 
@@ -27,13 +28,12 @@ class NotificationService:
             verb=verb,
             description=description,
             action_object=action_object,
-            target=target
+            target=target,
         )[0][1]
 
         # Get the first notification
         notification_instance = created_notifications[0]
-        notification_instance_data = NotificationSerializer(
-            notification_instance).data
+        notification_instance_data = NotificationSerializer(notification_instance).data
 
         channel_layer = get_channel_layer()
 
@@ -45,7 +45,7 @@ class NotificationService:
             group_name,
             {
                 # The name of the consumer method to call (see consumers.py)
-                'type': 'notification.message',
-                'data': notification_instance_data
-            }
+                "type": "notification.message",
+                "data": notification_instance_data,
+            },
         )
