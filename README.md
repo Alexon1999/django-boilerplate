@@ -1,5 +1,7 @@
 # Scheduler
 
+schedules periodic tasks.
+
 ## Introduction
 
 - Django** is a high-performance Python web framework that encourages rapid development and clean, pragmatic design.
