@@ -4,7 +4,7 @@
 
 To achieve the real time communication with client and server, We use **django-channels** (websocket implementation).
 
-### Usage of Websocket to get Notifications in Real time
+### Example of Websocket endpoint to get Notifications in Real time
 
 
 ```javascript
