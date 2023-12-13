@@ -8,7 +8,7 @@ services:
       - ./.env.prod
     ports:
       - 8001:8001
-    command: gunicorn config.wsgi:application --bind 0.0.0.0:8001 --workers 4 --timeout 120
+    command: daphne config.asgi:application --bind 0.0.0.0 --port 8001
     networks:
       - boilerplate_prod_network
     volumes:
