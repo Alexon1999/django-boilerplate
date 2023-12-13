@@ -1,7 +1,5 @@
 # Email service with Django, Celery, RabbitMQ and Redis
 
-![Send Email Workflow](./doc/assets/img/email.png)
-
 This document describes how to set up an e-mail service using Django, Celery, RabbitMQ and Redis. 
 
 ## Introduction
@@ -15,6 +13,24 @@ This document describes how to set up an e-mail service using Django, Celery, Ra
 - RabbitMQ** is an open source message broker that provides a robust platform for routing messages between processes and applications.
 
 - Redis** is an in-memory database that can be used as a results backend for Celery.
+
+
+## Workflow
+
+![Send Email Workflow](./doc/assets/img/email.png)
+
+Task Creation: Within your Django application, a task (such as sending an email) is defined and triggered. This could be in response to a user action, a scheduled event, or any other logic within your application.
+
+Task Offloading: The Django application offloads this task to Celery. This is typically done by calling a function decorated as a Celery task, often using the .delay() method for asynchronous execution. For example, send_mail.delay(...).
+
+Task Queuing: Celery, upon receiving the task, places it in a message queue. This is where RabbitMQ comes into play. RabbitMQ acts as the message broker, holding the task in a queue until a worker is available to process it.
+
+Task Processing: Celery workers, which are separate processes (or even separate machines) constantly listening to the queues in RabbitMQ, pick up the task when they are ready. The worker then executes the task.
+
+Result Storage: Once the task is executed, the result (if any) is stored in the result backend, which in this case is Redis. This step is optional and depends on whether the task produces a result that needs to be stored or further processed.
+
+Completion: After the task is executed and the result is stored (if applicable), the process is complete. The application can then access the result from the Redis backend if needed.
+
 ## Installation
 
 Make sure you install the necessary dependencies:
