@@ -1,6 +1,6 @@
 # Scheduler
 
-schedules periodic tasks.
+This document describes how to schedules periodic tasks using Django, Celery, RabbitMQ and Redis. 
 
 ## Introduction
 
