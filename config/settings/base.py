@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+from urllib.parse import urlparse
 
 import environ
 
@@ -227,3 +228,26 @@ EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
 
 # extra data for notifications
 DJANGO_NOTIFICATIONS_CONFIG = {"USE_JSONFIELD": True, "SOFT_DELETE": True}
+
+
+# Redis settings
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': env('REDIS_CACHE_BACKEND')
+    },
+}
+
+# Channels
+# Channel layers settings
+redis_channel_parsed_url = urlparse(env('REDIS_CHANNEL_BACKEND'))
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            # Point this to your Redis server
+            "hosts": [(redis_channel_parsed_url.hostname,
+                       redis_channel_parsed_url.port)]
+        },
+    },
+}
