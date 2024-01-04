@@ -227,3 +227,20 @@ EMAIL_PORT = env('EMAIL_PORT')
 EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS')
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+
+
+# Redis settings
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": env("REDIS_CACHE_BACKEND"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+# Enable caching
+CACHE_MIDDLEWARE_ALIAS = "default"
+CACHE_MIDDLEWARE_SECONDS = 600  # Cache for 10 minutes
+CACHE_MIDDLEWARE_KEY_PREFIX = ""
