@@ -36,3 +36,18 @@ build-push-image:
     IMAGE_TAG: $CI_COMMIT_SHORT_SHA
     DOCKERFILE_PATH: "Dockerfile"
     DOCKER_BUILD_ARGS: ""
+
+# deploy to server
+deploy:
+  stage: deploy
+  script:
+    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - ssh $SSH_USER@$SSH_HOST "echo 'Deploying to server'"
+  only:
+    - main
