@@ -40,7 +40,10 @@ build-push-image:
 # deploy to server
 deploy:
   stage: deploy
+  image: ubuntu:latest
   script:
+    - "which ssh-agent || ( apt update -y && apt install openssh-client -y )"
+    - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
