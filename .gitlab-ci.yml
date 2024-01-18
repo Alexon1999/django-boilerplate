@@ -62,10 +62,14 @@ deploy:
     - ssh $SSH_USER@$SSH_HOST "mkdir -p $SSH_APP_PATH"
     - scp -r ./* $SSH_USER@$SSH_HOST:$SSH_APP_PATH
     # ENV_TESTING contains sensitive information, so we don't want to commit it to the repo
-    - echo "$ENV_TESTING" > $CI_PROJECT_DIR/.env.testing
-    - scp $CI_PROJECT_DIR/.env.testing $SSH_USER@$SSH_HOST:$SSH_APP_PATH/.env.testing
+    - echo "$ENV_TESTING" > $CI_PROJECT_DIR/.env
+    - scp $CI_PROJECT_DIR/.env $SSH_USER@$SSH_HOST:$SSH_APP_PATH/.env
     # add docker login credentials to the server
     - ssh $SSH_USER@$SSH_HOST "echo \"$REGISTRY_PASSWORD\" | docker login $REGISTRY_URL -u \"$REGISTRY_USER\" --password-stdin"
+    # put IMAGE_NAME and IMAGE_TAG , REGISTRY_URL in the .env file
+    - ssh $SSH_USER@$SSH_HOST "echo \"IMAGE_NAME=$IMAGE_NAME\" >> $SSH_APP_PATH/.env"
+    - ssh $SSH_USER@$SSH_HOST "echo \"IMAGE_TAG=$IMAGE_TAG\" >> $SSH_APP_PATH/.env"
+    - ssh $SSH_USER@$SSH_HOST "echo \"REGISTRY_URL=$REGISTRY_URL\" >> $SSH_APP_PATH/.env"
     - ssh $SSH_USER@$SSH_HOST "cd $SSH_APP_PATH && IMAGE_NAME=$IMAGE_NAME IMAGE_TAG=$IMAGE_TAG REGISTRY_URL=$REGISTRY_URL docker compose -f docker-compose.testing.yml up -d --build"
     # check if the app is running
     - ssh $SSH_USER@$SSH_HOST "curl -s http://localhost:8000/healthcheck | grep -q 'OK'"

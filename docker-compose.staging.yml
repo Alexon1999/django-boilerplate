@@ -1,11 +1,9 @@
 version: "3"
 services:
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG
     env_file:
-      - ./.env.staging
+      - ./.env
     ports:
       - 8001:8001
     command: gunicorn config.wsgi:application --bind 0.0.0.0:8001 --workers 4 --timeout 120
