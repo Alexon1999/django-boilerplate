@@ -54,8 +54,8 @@ deploy:
     - ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
     - ssh $SSH_USER@$SSH_HOST "echo 'Deploying to server'"
-    - ssh $SSH_USER@$SSH_HOST "rm -rf /tmp/$SSH_APP_PATH"
-    - ssh $SSH_USER@$SSH_HOST "mv $SSH_APP_PATH /tmp"
+    - ssh $SSH_USER@$SSH_HOST "rm -rf /tmp/$SSH_APP_PATH" || true
+    - ssh $SSH_USER@$SSH_HOST "mv $SSH_APP_PATH /tmp" || true
     - ssh $SSH_USER@$SSH_HOST "mkdir -p $SSH_APP_PATH"
     - scp -r ./* $SSH_USER@$SSH_HOST:$SSH_APP_PATH
     - ssh $SSH_USER@$SSH_HOST "cd $SSH_APP_PATH && docker-compose -f docker-compose.testing.yml up -d --build"
