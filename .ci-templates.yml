@@ -21,7 +21,7 @@
     - postgres:latest
   variables:
     ENV_FILE: .cicd/.env.ci
-    POSTGRES_DB: nao_test
+    POSTGRES_DB: boilerplate
     POSTGRES_USER: postgres
     POSTGRES_PASSWORD: postgres
   before_script:
