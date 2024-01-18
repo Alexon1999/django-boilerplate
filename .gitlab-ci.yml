@@ -44,9 +44,6 @@ deploy:
   variables:
     IMAGE_NAME: boilerplate/api
     IMAGE_TAG: $CI_COMMIT_SHORT_SHA
-  before_script:
-    # docker login
-    - echo "$REGISTRY_PASSWORD" | docker login $REGISTRY_URL -u "$REGISTRY_USER" --password-stdin
   script:
     - which ssh-agent || ( apt update -y && apt install openssh-client -y )
     - eval $(ssh-agent -s)
@@ -67,6 +64,8 @@ deploy:
     # ENV_TESTING contains sensitive information, so we don't want to commit it to the repo
     - echo "$ENV_TESTING" > $CI_PROJECT_DIR/.env.testing
     - scp $CI_PROJECT_DIR/.env.testing $SSH_USER@$SSH_HOST:$SSH_APP_PATH/.env.testing
+    # add docker login credentials to the server
+    - ssh $SSH_USER@$SSH_HOST "echo \"$REGISTRY_PASSWORD\" | docker login $REGISTRY_URL -u \"$REGISTRY_USER\" --password-stdin"
     - ssh $SSH_USER@$SSH_HOST "cd $SSH_APP_PATH && IMAGE_NAME=$IMAGE_NAME IMAGE_TAG=$IMAGE_TAG REGISTRY_URL=$REGISTRY_URL docker compose -f docker-compose.testing.yml up -d --build"
     # check if the app is running
     - ssh $SSH_USER@$SSH_HOST "curl -s http://localhost:8000/healthcheck | grep -q 'OK'"
