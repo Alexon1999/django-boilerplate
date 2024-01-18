@@ -61,7 +61,7 @@ deploy:
     # ENV_TESTING contains sensitive information, so we don't want to commit it to the repo
     - echo "$ENV_TESTING" > $CI_PROJECT_DIR/.env.testing
     - scp $CI_PROJECT_DIR/.env.testing $SSH_USER@$SSH_HOST:$SSH_APP_PATH/.env.testing
-    - ssh $SSH_USER@$SSH_HOST "cd $SSH_APP_PATH && docker compose -f docker-compose.testing.yml up --build"
+    - ssh $SSH_USER@$SSH_HOST "cd $SSH_APP_PATH && docker compose -f docker-compose.testing.yml up -d --build"
     # check if the app is running
     - ssh $SSH_USER@$SSH_HOST "curl -s http://localhost:8000/healthcheck | grep -q 'OK'"
   only:
