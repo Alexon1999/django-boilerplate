@@ -29,4 +29,4 @@
     - pip install --cache-dir="$PIP_CACHE_DIR" -r requirements.txt
     - echo "$ENV_CI" > .env
     - chmod +x ./scripts/loadenv.sh
-    - ./scripts/loadenv.sh .env
+    - source ./scripts/loadenv.sh .env
