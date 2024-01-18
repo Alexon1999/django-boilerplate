@@ -34,8 +34,10 @@ services:
     image: postgres:15
     ports:
       - 5432:5432
-    env_file:
-      - ./.env.db.testing
+    environment:
+      - POSTGRES_DB=boilerplate
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     networks:
