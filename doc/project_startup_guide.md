@@ -76,6 +76,10 @@
 ## 💡 Setting up Precommit
 It's important to enforce code styling and formatting. we use **[pre-commit](consistent_codebase.md)**. before each commit we do linting and formatting.
 
+**In you IDE, Install following extensions :**
+- **Flake8** : linter
+- **Black** : formatter
+
 <br>
 
 
