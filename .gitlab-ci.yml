@@ -49,10 +49,10 @@ deploy:
     - echo 'echo "$SSH_KEY_PASSPHRASE"' > ~/.ssh/.print_ssh_password
     - chmod 700 ~/.ssh/.print_ssh_password
     - chmod +x ~/.ssh/.print_ssh_password
-    - chmod 644 ~/.ssh/known_hosts
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | DISPLAY=":0.0" SSH_ASKPASS=~/.ssh/.print_ssh_password setsid ssh-add - > /dev/null
     - ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
     - ssh $SSH_USER@$SSH_HOST "echo 'Deploying to server'"
   only:
     - main
