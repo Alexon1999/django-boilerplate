@@ -42,11 +42,11 @@
     SCP_CMD: "scp -P $SSH_PORT"
   script:
     # Echo environment variables
-    - echo "Environment: $ENVIRONMENT"
-    - echo "Environment URL: $ENVIRONMENT_URL"
-    - echo "SSH_USER - SSH_HOST - SSH_PORT: $SSH_USER - $SSH_HOST - $SSH_PORT"
-    - echo "API Image: $API_IMAGE_NAME:$API_IMAGE_TAG"
-    - echo "Web API Image: $WEB_API_IMAGE_NAME:$WEB_API_IMAGE_TAG"
+    # - echo "Environment: $ENVIRONMENT"
+    # - echo "Environment URL: $ENVIRONMENT_URL"
+    # - echo "SSH_USER - SSH_HOST - SSH_PORT: $SSH_USER - $SSH_HOST - $SSH_PORT"
+    # - echo "API Image: $API_IMAGE_NAME:$API_IMAGE_TAG"
+    # - echo "Web API Image: $WEB_API_IMAGE_NAME:$WEB_API_IMAGE_TAG"
 
     # Setup SSH
     - which ssh-agent || ( apt update -y && apt install openssh-client -y )
@@ -82,7 +82,7 @@
 
     # Docker login and start containers
     - $SSH_CMD "echo \"$REGISTRY_PASSWORD\" | docker login $REGISTRY_URL -u \"$REGISTRY_USER\" --password-stdin"
-    - $SSH_CMD "cd $SSH_APP_PATH && docker compose -f docker-compose.${ENVIRONMENT}.yml up -d --build"
+    - $SSH_CMD "cd $SSH_APP_PATH && docker compose -f docker-compose.$ENVIRONMENT.yml up -d --build"
 
     # Health check
     - $SSH_CMD "curl -s http://localhost:8000/healthcheck | grep -q 'OK'"
