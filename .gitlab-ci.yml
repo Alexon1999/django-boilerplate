@@ -49,7 +49,6 @@ build-push-api-image:
 build-push-webapi-image:
   stage: build-image
   extends:
-    - .can-build-kaniko
     - .build-kaniko
   variables:
     IMAGE_NAME: boilerplate/webapi
@@ -61,6 +60,8 @@ build-push-webapi-image:
     - /kaniko/executor --context ./nginx --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG $DOCKER_BUILD_ARGS
     - /kaniko/executor --context ./nginx --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$LATEST_TAG $DOCKER_BUILD_ARGS
   rules:
+    - if: "$CI_COMMIT_BRANCH == 'main' || $CI_COMMIT_BRANCH =~ /^release\\/.*$/"
+      when: always
     - changes:
         - nginx/**/*
       when: always
