@@ -27,7 +27,7 @@ test:
       - htmlcov/
 
 # build and push docker image to registry
-build-push-image:
+build-push-api-image:
   stage: build-image
   extends:
     - .build-kaniko
@@ -36,6 +36,22 @@ build-push-image:
     IMAGE_TAG: $CI_COMMIT_SHORT_SHA
     DOCKERFILE_PATH: "Dockerfile"
     DOCKER_BUILD_ARGS: ""
+
+build-push-webapi-image:
+  stage: build-image
+  extends:
+    - .build-kaniko
+  variables:
+    IMAGE_NAME: boilerplate/webapi
+    IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+    LATEST_TAG: latest
+    DOCKERFILE_PATH: "nginx/Dockerfile"
+    DOCKER_BUILD_ARGS: ""
+  script:
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$LATEST_TAG $DOCKER_BUILD_ARGS
+  only:
+    changes:
+      - nginx/**/*
 
 # deploy to server
 # deploy:
@@ -83,8 +99,10 @@ deploy:
   stage: deploy
   image: ubuntu:latest
   variables:
-    IMAGE_NAME: boilerplate/api
-    IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+    API_IMAGE_NAME: boilerplate/api
+    API_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+    WEB_API_IMAGE_NAME: boilerplate/webapi
+    WEB_API_IMAGE_TAG: latest
     SSH_CMD: "ssh -p $SSH_TESTING_PORT $SSH_USER@$SSH_TESTING_HOST"
     SCP_CMD: "scp -P $SSH_TESTING_PORT"
   script:
@@ -114,11 +132,12 @@ deploy:
 
     # Set up environment variables on the server
     # put IMAGE_NAME and IMAGE_TAG , REGISTRY_URL in the .env file
-    - $SSH_CMD "echo \"IMAGE_NAME=$IMAGE_NAME\nIMAGE_TAG=$IMAGE_TAG\nREGISTRY_URL=$REGISTRY_URL\" >> $SSH_APP_PATH/.env"
+    - $SSH_CMD "echo \"API_IMAGE_NAME=$API_IMAGE_NAME\nAPI_IMAGE_TAG=$API_IMAGE_TAG\nREGISTRY_URL=$REGISTRY_URL\" >> $SSH_APP_PATH/.env"
+    - $SSH_CMD "echo \"WEB_API_IMAGE_NAME=$WEB_API_IMAGE_NAME\nWEB_API_IMAGE_TAG=$WEB_API_IMAGE_TAG\nREGISTRY_URL=$REGISTRY_URL\" >> $SSH_APP_PATH/.env"
 
     # Docker login and start containers
     - $SSH_CMD "echo \"$REGISTRY_PASSWORD\" | docker login $REGISTRY_URL -u \"$REGISTRY_USER\" --password-stdin"
-    - $SSH_CMD "docker compose -f $SSH_APP_PATH/docker-compose.testing.yml up -d --build"
+    - $SSH_CMD "cd $SSH_APP_PATH && docker compose -f docker-compose.testing.yml up -d --build"
 
     # Health check
     - $SSH_CMD "curl -s http://localhost:8000/healthcheck | grep -q 'OK'"
