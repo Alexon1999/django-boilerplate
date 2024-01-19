@@ -30,9 +30,6 @@
     POSTGRES_USER: postgres
     POSTGRES_PASSWORD: postgres
   before_script:
-    - apt-get update && apt-get install -y build-essential netcat
-    - pip install --upgrade pip --cache-dir="$PIP_CACHE_DIR"
-    - pip install --cache-dir="$PIP_CACHE_DIR" -r requirements.txt
     - echo "$ENV_CI" > .env
     - cat .env
     - set -a; source .env; set +a;
