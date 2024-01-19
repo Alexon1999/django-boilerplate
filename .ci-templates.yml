@@ -35,9 +35,8 @@
     - pip install --cache-dir="$PIP_CACHE_DIR" -r requirements.txt
     - echo "$ENV_CI" > .env
     - cat .env
-    - chmod +x ./scripts/loadenv.sh
-    - source ./scripts/loadenv.sh .env
-    - echo $SECRET_KEY
+    - set -a; source .env; set +a;
+    - echo "$SECRET_KEY"
 
 .deploy-environment:
   image: ubuntu:latest
