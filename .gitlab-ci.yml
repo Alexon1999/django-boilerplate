@@ -38,6 +38,7 @@ test:
 build-push-api-image:
   stage: build-image
   extends:
+    - .can-build-kaniko
     - .build-kaniko
   variables:
     IMAGE_NAME: boilerplate/api
@@ -48,6 +49,7 @@ build-push-api-image:
 build-push-webapi-image:
   stage: build-image
   extends:
+    - .can-build-kaniko
     - .build-kaniko
   variables:
     IMAGE_NAME: boilerplate/webapi
