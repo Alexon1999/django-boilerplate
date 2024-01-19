@@ -36,6 +36,7 @@
     - echo "$ENV_CI" > .env
     - chmod +x ./scripts/loadenv.sh
     - source ./scripts/loadenv.sh .env
+    - echo $SECRET_KEY
 
 .deploy-environment:
   image: ubuntu:latest
