@@ -107,6 +107,5 @@ deploy-production:
     WEB_API_IMAGE_NAME: boilerplate/webapi
     WEB_API_IMAGE_TAG: latest
   extends:
-    - .on-release
+    - .on-release-manual
     - .deploy-environment
-  when: manual
