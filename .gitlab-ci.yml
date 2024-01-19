@@ -31,6 +31,8 @@ test:
       junit: report.xml
     paths:
       - htmlcov/
+      - coverage.xml
+      - report.xml
 
 # build and push docker image to registry
 build-push-api-image:
