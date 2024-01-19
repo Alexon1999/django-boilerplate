@@ -64,55 +64,17 @@ build-push-webapi-image:
 
 deploy-testing:
   stage: deploy
-  image: ubuntu:latest
-  environment:
-    name: testing
-    url: https://api.testing.boilerplate.appftth.fr
   variables:
+    ENVIRONMENT: testing
+    ENVIRONMENT_URL: https://api.testing.boilerplate.appftth.fr
+    ENV_FILE: $ENV_TESTING
+    SSH_HOST: $SSH_TESTING_HOST
+    SSH_PORT: $SSH_TESTING_PORT
     API_IMAGE_NAME: boilerplate/api
     API_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
     WEB_API_IMAGE_NAME: boilerplate/webapi
     WEB_API_IMAGE_TAG: latest
-    SSH_CMD: "ssh -p $SSH_TESTING_PORT $SSH_USER@$SSH_TESTING_HOST"
-    SCP_CMD: "scp -P $SSH_TESTING_PORT"
-  script:
-    # Setup SSH
-    - which ssh-agent || ( apt update -y && apt install openssh-client -y )
-    - eval $(ssh-agent -s)
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - echo 'echo "$SSH_KEY_PASSPHRASE"' > ~/.ssh/.print_ssh_password
-    - chmod 700 ~/.ssh/.print_ssh_password
-    - chmod +x ~/.ssh/.print_ssh_password
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | DISPLAY=":0.0" SSH_ASKPASS=~/.ssh/.print_ssh_password setsid ssh-add - > /dev/null
-    - ssh-keyscan $SSH_TESTING_HOST >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - ssh $SSH_USER@$SSH_TESTING_HOST -p $SSH_TESTING_PORT "echo 'Deploying to server'"
-
-    # Preparing the server
-    - $SSH_CMD "rm -rf /tmp/app || true && mkdir -p /tmp/app && mv $SSH_APP_PATH /tmp/app || true"
-    - $SSH_CMD "cd $SSH_APP_PATH && docker compose -f docker-compose.testing.yml down || true && rm -rf $SSH_APP_PATH"
-    - $SSH_CMD "mkdir -p $SSH_APP_PATH"
-
-    # Copy necessary files
-    - $SCP_CMD $CI_PROJECT_DIR/docker-compose.testing.yml $SSH_USER@$SSH_TESTING_HOST:$SSH_APP_PATH
-    - echo "$ENV_TESTING" > .env
-    - $SCP_CMD .env $SSH_USER@$SSH_TESTING_HOST:$SSH_APP_PATH
-
-    # Set up environment variables on the server
-    # put REGISTRY_URL, images, tags in the .env file
-    - $SSH_CMD "echo \"REGISTRY_URL=$REGISTRY_URL\" >> $SSH_APP_PATH/.env"
-    - $SSH_CMD "echo \"API_IMAGE_NAME=$API_IMAGE_NAME\" >> $SSH_APP_PATH/.env"
-    - $SSH_CMD "echo \"API_IMAGE_TAG=$API_IMAGE_TAG\" >> $SSH_APP_PATH/.env"
-    - $SSH_CMD "echo \"WEB_API_IMAGE_NAME=$WEB_API_IMAGE_NAME\" >> $SSH_APP_PATH/.env"
-    - $SSH_CMD "echo \"WEB_API_IMAGE_TAG=$WEB_API_IMAGE_TAG\" >> $SSH_APP_PATH/.env"
-
-    # Docker login and start containers
-    - $SSH_CMD "echo \"$REGISTRY_PASSWORD\" | docker login $REGISTRY_URL -u \"$REGISTRY_USER\" --password-stdin"
-    - $SSH_CMD "cd $SSH_APP_PATH && docker compose -f docker-compose.testing.yml up -d --build"
-
-    # Health check
-    - $SSH_CMD "curl -s http://localhost:8000/healthcheck | grep -q 'OK'"
+  extends:
+    - .deploy-environment
   only:
     - main
