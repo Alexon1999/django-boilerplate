@@ -75,6 +75,38 @@ deploy-testing:
     WEB_API_IMAGE_NAME: boilerplate/webapi
     WEB_API_IMAGE_TAG: latest
   extends:
+    - .on-main
     - .deploy-environment
-  only:
-    - main
+
+deploy-staging:
+  stage: deploy
+  variables:
+    ENVIRONMENT: staging
+    ENVIRONMENT_URL: https://api.staging.boilerplate.appftth.fr
+    ENV_FILE: $ENV_STAGING
+    SSH_HOST: $SSH_STAGING_HOST
+    SSH_PORT: $SSH_STAGING_PORT
+    API_IMAGE_NAME: boilerplate/api
+    API_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+    WEB_API_IMAGE_NAME: boilerplate/webapi
+    WEB_API_IMAGE_TAG: latest
+  extends:
+    - .on-release
+    - .deploy-environment
+
+deploy-production:
+  stage: deploy
+  variables:
+    ENVIRONMENT: production
+    ENVIRONMENT_URL: https://api.boilerplate.appftth.fr
+    ENV_FILE: $ENV_PROD
+    SSH_HOST: $SSH_PROD_HOST
+    SSH_PORT: $SSH_PROD_PORT
+    API_IMAGE_NAME: boilerplate/api
+    API_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+    WEB_API_IMAGE_NAME: boilerplate/webapi
+    WEB_API_IMAGE_TAG: latest
+  extends:
+    - .on-release
+    - .deploy-environment
+  when: manual
