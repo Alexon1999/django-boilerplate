@@ -65,9 +65,9 @@
     - $SSH_CMD "echo 'Deploying to server'"
 
     # Preparing the server
+    - $SSH_CMD "cd $SSH_APP_PATH && docker compose -f docker-compose.$ENVIRONMENT.yml down || true"
     - $SSH_CMD "rm -rf /tmp/app || true && mkdir -p /tmp/app && mv $SSH_APP_PATH /tmp/app || true"
-    - $SSH_CMD "cd $SSH_APP_PATH && docker compose -f docker-compose.$ENVIRONMENT.yml down || true && rm -rf $SSH_APP_PATH"
-    - $SSH_CMD "mkdir -p $SSH_APP_PATH"
+    - $SSH_CMD "rm -rf $SSH_APP_PATH && mkdir -p $SSH_APP_PATH"
 
     # Copy necessary files
     - $SCP_CMD $CI_PROJECT_DIR/docker-compose.$ENVIRONMENT.yml $SSH_USER@$SSH_HOST:$SSH_APP_PATH
