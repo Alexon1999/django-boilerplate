@@ -43,6 +43,7 @@
     - source ./scripts/loadenv.sh .env
 
 .deploy-environment:
+  allow_failure: false
   image: ubuntu:latest
   environment:
     name: $ENVIRONMENT
