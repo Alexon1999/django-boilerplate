@@ -50,9 +50,9 @@ build-push-webapi-image:
   script:
     - /kaniko/executor --context ./nginx --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG $DOCKER_BUILD_ARGS
     - /kaniko/executor --context ./nginx --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$LATEST_TAG $DOCKER_BUILD_ARGS
-  # only:
-  #   changes:
-  #     - nginx/**/*
+  only:
+    changes:
+      - nginx/**/*
 
 # deploy to server
 # deploy:
@@ -125,16 +125,17 @@ deploy:
     - $SSH_CMD "rm -rf /tmp/$SSH_APP_PATH || true && mv $SSH_APP_PATH /tmp || true && mkdir -p $SSH_APP_PATH"
 
     # Copy necessary files
-    - $SSH_CMD "mkdir -p $SSH_APP_PATH/nginx"
-    - $SCP_CMD -r $CI_PROJECT_DIR/nginx $SSH_USER@$SSH_TESTING_HOST:$SSH_APP_PATH/nginx
     - $SCP_CMD $CI_PROJECT_DIR/docker-compose.testing.yml $SSH_USER@$SSH_TESTING_HOST:$SSH_APP_PATH
     - echo "$ENV_TESTING" > .env
     - $SCP_CMD .env $SSH_USER@$SSH_TESTING_HOST:$SSH_APP_PATH
 
     # Set up environment variables on the server
-    # put IMAGE_NAME and IMAGE_TAG , REGISTRY_URL in the .env file
-    - $SSH_CMD "echo \"API_IMAGE_NAME=$API_IMAGE_NAME\nAPI_IMAGE_TAG=$API_IMAGE_TAG\nREGISTRY_URL=$REGISTRY_URL\" >> $SSH_APP_PATH/.env"
-    - $SSH_CMD "echo \"WEB_API_IMAGE_NAME=$WEB_API_IMAGE_NAME\nWEB_API_IMAGE_TAG=$WEB_API_IMAGE_TAG\nREGISTRY_URL=$REGISTRY_URL\" >> $SSH_APP_PATH/.env"
+    # put REGISTRY_URL, images, tags in the .env file
+    - $SSH_CMD "echo \"REGISTRY_URL=$REGISTRY_URL\" >> $SSH_APP_PATH/.env"
+    - $SSH_CMD "echo \"API_IMAGE_NAME=$API_IMAGE_NAME\" >> $SSH_APP_PATH/.env"
+    - $SSH_CMD "echo \"API_IMAGE_TAG=$IMAGE_TAG\" >> $SSH_APP_PATH/.env"
+    - $SSH_CMD "echo \"WEB_API_IMAGE_NAME=$WEB_API_IMAGE_NAME\" >> $SSH_APP_PATH/.env"
+    - $SSH_CMD "echo \"WEB_API_IMAGE_TAG=$WEB_API_IMAGE_TAG\" >> $SSH_APP_PATH/.env"
 
     # Docker login and start containers
     - $SSH_CMD "echo \"$REGISTRY_PASSWORD\" | docker login $REGISTRY_URL -u \"$REGISTRY_USER\" --password-stdin"
