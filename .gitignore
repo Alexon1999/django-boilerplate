@@ -147,3 +147,6 @@ celerybeat-*
 
 staticfiles/
 mediafiles/
+
+!.env.example
+.env.*
