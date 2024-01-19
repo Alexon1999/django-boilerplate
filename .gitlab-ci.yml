@@ -59,9 +59,11 @@ build-push-webapi-image:
     changes:
       - nginx/**/*
 
-deploy:
+deploy-testing:
   stage: deploy
   image: ubuntu:latest
+  environment:
+    name: testing
   variables:
     API_IMAGE_NAME: boilerplate/api
     API_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
