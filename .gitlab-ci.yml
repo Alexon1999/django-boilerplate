@@ -49,9 +49,9 @@ build-push-webapi-image:
     DOCKER_BUILD_ARGS: ""
   script:
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$LATEST_TAG $DOCKER_BUILD_ARGS
-  only:
-    changes:
-      - nginx/**/*
+  # only:
+  #   changes:
+  #     - nginx/**/*
 
 # deploy to server
 # deploy:
