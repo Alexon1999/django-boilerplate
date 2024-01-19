@@ -42,7 +42,8 @@
     SCP_CMD: "scp -P $SSH_PORT"
   script:
     # Echo environment variables
-    - echo "Environment: $ENVIRONMENT"
+    - echo "$ENVIRONMENT on $ENVIRONMENT_URL using $SSH_USER - $SSH_HOST - $SSH_PORT"
+    - echo "$API_IMAGE_NAME:$API_IMAGE_TAG $WEB_API_IMAGE_NAME:$WEB_API_IMAGE_TAG"
 
     # Setup SSH
     - which ssh-agent || ( apt update -y && apt install openssh-client -y )
