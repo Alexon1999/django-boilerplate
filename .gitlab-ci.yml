@@ -20,7 +20,6 @@ test:
   extends:
     - .environment-django-ci
   script:
-    - echo "$SECRET_KEY"
     # # Run pytest with generation both HTML and Cobertura XML coverage reports, and JUnit XML test report
     # if no tests found, convert exit code 5 to 0
     - pytest --cov=. --cov-report html --cov-report xml:coverage.xml --cov-report term --junitxml=report.xml || [ $? -eq 5 ]
