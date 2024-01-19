@@ -133,7 +133,7 @@ deploy:
     # put REGISTRY_URL, images, tags in the .env file
     - $SSH_CMD "echo \"REGISTRY_URL=$REGISTRY_URL\" >> $SSH_APP_PATH/.env"
     - $SSH_CMD "echo \"API_IMAGE_NAME=$API_IMAGE_NAME\" >> $SSH_APP_PATH/.env"
-    - $SSH_CMD "echo \"API_IMAGE_TAG=$IMAGE_TAG\" >> $SSH_APP_PATH/.env"
+    - $SSH_CMD "echo \"API_IMAGE_TAG=$API_IMAGE_TAG\" >> $SSH_APP_PATH/.env"
     - $SSH_CMD "echo \"WEB_API_IMAGE_NAME=$WEB_API_IMAGE_NAME\" >> $SSH_APP_PATH/.env"
     - $SSH_CMD "echo \"WEB_API_IMAGE_TAG=$WEB_API_IMAGE_TAG\" >> $SSH_APP_PATH/.env"
 

@@ -1,7 +1,7 @@
 version: "3"
 services:
   api:
-    image: $REGISTRY_URL/$API_IMAGE_NAME:$API_IMAGE_TAG
+    image: $REGISTRY_URL/$API_IMAGE_NAME:${API_IMAGE_TAG:-latest}
     env_file:
       - ./.env
     ports:
@@ -14,7 +14,7 @@ services:
       - media_volume:/home/app/mediafiles
 
   web_api:
-    image: $REGISTRY_URL/$WEB_API_IMAGE_NAME:$WEB_API_IMAGE_TAG
+    image: $REGISTRY_URL/$WEB_API_IMAGE_NAME:${WEB_API_IMAGE_TAG:-latest}
     restart: always
     ports:
       - 8000:8000
