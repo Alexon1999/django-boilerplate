@@ -67,6 +67,7 @@ deploy-testing:
   image: ubuntu:latest
   environment:
     name: testing
+    url: https://api.testing.boilerplate.appftth.fr
   variables:
     API_IMAGE_NAME: boilerplate/api
     API_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
