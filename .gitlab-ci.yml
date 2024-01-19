@@ -61,8 +61,7 @@ build-push-webapi-image:
     - /kaniko/executor --context ./nginx --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$LATEST_TAG $DOCKER_BUILD_ARGS
   rules:
     - if: "$CI_COMMIT_BRANCH == 'main' || $CI_COMMIT_BRANCH =~ /^release\\/.*$/"
-      when: always
-    - changes:
+      changes:
         - nginx/**/*
       when: always
 
