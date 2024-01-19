@@ -60,9 +60,10 @@ build-push-webapi-image:
   script:
     - /kaniko/executor --context ./nginx --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG $DOCKER_BUILD_ARGS
     - /kaniko/executor --context ./nginx --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$LATEST_TAG $DOCKER_BUILD_ARGS
-  only:
-    changes:
-      - nginx/**/*
+  rules:
+    - changes:
+        - nginx/**/*
+      when: always
 
 deploy-testing:
   stage: deploy
