@@ -8,8 +8,9 @@
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
-  script:
+  before_script:
     - echo "{\"auths\":{\"$REGISTRY_URL \":{\"username\":\"$REGISTRY_USER\",\"password\":\"$REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+  script:
     - /kaniko/executor --context . --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG $DOCKER_BUILD_ARGS
   variables:
     DOCKERFILE_PATH: Dockerfile
