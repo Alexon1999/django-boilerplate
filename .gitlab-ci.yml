@@ -118,7 +118,7 @@ deploy:
 
     # Docker login and start containers
     - $SSH_CMD "echo \"$REGISTRY_PASSWORD\" | docker login $REGISTRY_URL -u \"$REGISTRY_USER\" --password-stdin"
-    - $SSH_CMD "docker-compose -f $SSH_APP_PATH/docker-compose.testing.yml up -d --build"
+    - $SSH_CMD "docker compose -f $SSH_APP_PATH/docker-compose.testing.yml up -d --build"
 
     # Health check
     - $SSH_CMD "curl -s http://localhost:8000/healthcheck | grep -q 'OK'"
