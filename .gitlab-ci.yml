@@ -54,48 +54,6 @@ build-push-webapi-image:
     changes:
       - nginx/**/*
 
-# deploy to server
-# deploy:
-#   stage: deploy
-#   image: ubuntu:latest
-#   variables:
-#     IMAGE_NAME: boilerplate/api
-#     IMAGE_TAG: $CI_COMMIT_SHORT_SHA
-#   script:
-#     # setup
-#     - which ssh-agent || ( apt update -y && apt install openssh-client -y )
-#     - eval $(ssh-agent -s)
-#     - mkdir -p ~/.ssh
-#     - chmod 700 ~/.ssh
-#     - echo 'echo "$SSH_KEY_PASSPHRASE"' > ~/.ssh/.print_ssh_password
-#     - chmod 700 ~/.ssh/.print_ssh_password
-#     - chmod +x ~/.ssh/.print_ssh_password
-#     - eval $(ssh-agent -s)
-#     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | DISPLAY=":0.0" SSH_ASKPASS=~/.ssh/.print_ssh_password setsid ssh-add - > /dev/null
-#     - ssh-keyscan $SSH_TESTING_HOST >> ~/.ssh/known_hosts
-#     - chmod 644 ~/.ssh/known_hosts
-#     - ssh $SSH_USER@$SSH_TESTING_HOST -p $SSH_TESTING_PORT "echo 'Deploying to server'"
-#     - ssh $SSH_USER@$SSH_TESTING_HOST -p $SSH_TESTING_PORT "rm -rf /tmp/$SSH_APP_PATH" || true
-#     - ssh $SSH_USER@$SSH_TESTING_HOST -p $SSH_TESTING_PORT "mv $SSH_APP_PATH /tmp" || true
-#     - ssh $SSH_USER@$SSH_TESTING_HOST -p $SSH_TESTING_PORT "mkdir -p $SSH_APP_PATH"
-#     # copy just nginx folder and docker-compose files
-#     - scp -r $CI_PROJECT_DIR/nginx $SSH_USER@$SSH_TESTING_HOST:$SSH_APP_PATH -p $SSH_TESTING_PORT
-#     - scp $CI_PROJECT_DIR/docker-compose.testing.yml $SSH_USER@$SSH_TESTING_HOST:$SSH_APP_PATH/docker-compose.testing.yml -p $SSH_TESTING_PORT
-#     # ENV_TESTING contains sensitive information, so we don't want to commit it to the repo
-#     - echo "$ENV_TESTING" > $CI_PROJECT_DIR/.env
-#     - scp $CI_PROJECT_DIR/.env $SSH_USER@$SSH_TESTING_HOST:$SSH_APP_PATH/.env -p $SSH_TESTING_PORT
-#     # add docker login credentials to the server
-#     - ssh $SSH_USER@$SSH_TESTING_HOST "echo \"$REGISTRY_PASSWORD\" | docker login $REGISTRY_URL -u \"$REGISTRY_USER\" --password-stdin"
-#     # put IMAGE_NAME and IMAGE_TAG , REGISTRY_URL in the .env file
-#     - ssh $SSH_USER@$SSH_TESTING_HOST "echo \"IMAGE_NAME=$IMAGE_NAME\" >> $SSH_APP_PATH/.env"
-#     - ssh $SSH_USER@$SSH_TESTING_HOST "echo \"IMAGE_TAG=$IMAGE_TAG\" >> $SSH_APP_PATH/.env"
-#     - ssh $SSH_USER@$SSH_TESTING_HOST "echo \"REGISTRY_URL=$REGISTRY_URL\" >> $SSH_APP_PATH/.env"
-#     - ssh $SSH_USER@$SSH_TESTING_HOST "docker compose -f docker-compose.testing.yml up -d --build"
-#     # check if the app is running
-#     - ssh $SSH_USER@$SSH_TESTING_HOST "curl -s http://localhost:8000/healthcheck | grep -q 'OK'"
-#   only:
-#     - main
-
 deploy:
   stage: deploy
   image: ubuntu:latest
