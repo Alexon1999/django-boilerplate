@@ -94,6 +94,8 @@ build-push-webapi-image-release:
 
 deploy-testing:
   stage: deploy
+  needs:
+    - job: build-push-api-image
   variables:
     ENVIRONMENT: testing
     ENVIRONMENT_URL: https://api.testing.boilerplate.appftth.fr
@@ -110,6 +112,9 @@ deploy-testing:
 
 deploy-staging:
   stage: deploy
+  needs:
+    - job: build-push-api-image
+    - job: build-push-webapi-image
   variables:
     ENVIRONMENT: staging
     ENVIRONMENT_URL: https://api.staging.boilerplate.appftth.fr
@@ -126,6 +131,9 @@ deploy-staging:
 
 deploy-production:
   stage: deploy
+  needs:
+    - job: build-push-api-image
+    - job: build-push-webapi-image
   variables:
     ENVIRONMENT: production
     ENVIRONMENT_URL: https://api.boilerplate.appftth.fr
