@@ -5,17 +5,17 @@
 
 .on-release:
   rules:
-    - if: "$CI_COMMIT_BRANCH =~ /^release\\/.*$/"
+    - if: "$CI_COMMIT_BRANCH =~ /^release-v.*$/"
       when: always
 
 .on-release-manual:
   rules:
-    - if: "$CI_COMMIT_BRANCH =~ /^release\\/.*$/"
+    - if: "$CI_COMMIT_BRANCH =~ /^release-v.*$/"
       when: manual
 
 .can-build-kaniko:
   rules:
-    - if: "$CI_COMMIT_BRANCH == 'main' || $CI_COMMIT_BRANCH =~ /^release\\/.*$/"
+    - if: "$CI_COMMIT_BRANCH == 'main' || $CI_COMMIT_BRANCH =~ /^release-v.*$/"
       when: always
 
 .build-kaniko:

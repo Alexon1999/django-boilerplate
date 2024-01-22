@@ -50,7 +50,7 @@ A strategy that extends these concepts and avoids contradictions will result in 
 
 **Release Branches:**
 - **Description:** These branches are created for preparing releases. They might contain additional metadata or versioning information and are based on the main branch.
-- **Naming Convention:** `release/<version>`, for example, release/v1.2.3.
+- **Naming Convention:** `release-<version>`, for example, release-v1.2.3.
 - **Purpose:** Facilitate final preparations for a release like testing, documentation, and final tweaks. each release has an associated release branch that is based off the main branch. After announcing a release branch, only add serious bug fixes to the branch. If possible, first merge these bug fixes into main, and then cherry-pick them into the release branch 
 
 **Hotfix Branches:**
@@ -131,7 +131,7 @@ Here’s a simplified version of the GitLab Flow, which includes the use of feat
 5. **Deployment to Testing**:
     - If the CI pipeline passes, The `main` branch is automatically deployed to a testing environment for further testing.
 6. **Staging/Pre-production to Production**:
-    - When you decide it's time for a release (by accumulating features), create a `release/v1.0.0` branch from main. CI/CD pipeline is configured so that any push to a  release/ branch will deploy to your staging or pre-production environment. Extensive testing and any pre-release activities happen in this staging environment.
+    - When you decide it's time for a release (by accumulating features), create a `release-v1.0.0` branch from main. CI/CD pipeline is configured so that any push to a  release- branch will deploy to your staging or pre-production environment. Extensive testing and any pre-release activities happen in this staging environment.
     - Extensive testing and any pre-release activities happen in this environment.
     - This branch should trigger a deployment to a staging or pre-production environment. 
     - The code on this branch should not include new features after this point—only bug fixes, performance improvements, or other necessary updates.
@@ -150,7 +150,7 @@ In this `.gitlab-ci.yml`:
 
 This flow ensures that all new features are reviewed and tested before they are deployed to production. The usage of environments and tagging (release) helps manage releases in an orderly fashion, and bugfixes can be handled expediently when needed.
 
-Remember to protect the `release/*` branches so that only certain users can push to them and trigger deployments.
+Remember to protect the `release-*` branches so that only certain users can push to them and trigger deployments.
 
 <br/>
 
@@ -176,16 +176,16 @@ Handling bugfixes and hotfixes in a continuous deployment environment like GitLa
 
   ```sh
   # Checkout the release branch
-  git checkout release/v1.2.3
+  git checkout release-v1.2.3
   # Create a bugfix branch
   git checkout -b bugfix/some-bug-release
   # Fix the bug and commit changes
   git commit -am "Fix bug for release v1.2.3"
   git push origin bugfix/some-bug-release
   # create new release
-  git checkout -b release/v1.2.4 release/v1.2.3
+  git checkout -b release-v1.2.4 release-v1.2.3
   git merge hotfix/v1.2.3-fix-description
-  git push origin release/v1.2.4
+  git push origin release-v1.2.4
   # back merge to main
   git checkout main
   git merge bugfix/some-bug-release
@@ -196,15 +196,15 @@ Handling bugfixes and hotfixes in a continuous deployment environment like GitLa
 - **Hotfixes**: When critical issues are found in production, hotfix branches are used to provide a quick resolution.
 
   ```sh
-  git checkout release/v1.2.3
+  git checkout release-v1.2.3
   git checkout -b hotfix/v1.2.3-fix-description
   # Apply the fix and commit changes
   git commit -am "Apply urgent hotfix for v1.2.3"
   git push --set-upstream origin hotfix/some-critical-issue-release
   # create new release
-  git checkout -b release/v1.2.4 release/v1.2.3
+  git checkout -b release-v1.2.4 release-v1.2.3
   git merge hotfix/v1.2.3-fix-description
-  git push origin release/v1.2.4
+  git push origin release-v1.2.4
   # back merge to main
   git checkout main
   git merge hotfix/v1.2.3-fix-description

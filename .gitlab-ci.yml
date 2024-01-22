@@ -46,6 +46,17 @@ build-push-api-image:
     DOCKERFILE_PATH: "Dockerfile"
     DOCKER_BUILD_ARGS: ""
 
+build-push-api-image-release:
+  stage: build-image
+  extends:
+    - .can-build-kaniko
+    - .build-kaniko
+  variables:
+    IMAGE_NAME: boilerplate/api
+    IMAGE_TAG: $CI_COMMIT_BRANCH
+    DOCKERFILE_PATH: "Dockerfile"
+    DOCKER_BUILD_ARGS: ""
+
 build-push-webapi-image:
   stage: build-image
   extends:
@@ -60,9 +71,25 @@ build-push-webapi-image:
     - /kaniko/executor --context ./nginx --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG $DOCKER_BUILD_ARGS
     - /kaniko/executor --context ./nginx --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$LATEST_TAG $DOCKER_BUILD_ARGS
   rules:
-    - if: "$CI_COMMIT_BRANCH == 'main' || $CI_COMMIT_BRANCH =~ /^release\\/.*$/"
+    - if: "$CI_COMMIT_BRANCH == 'main'"
       changes:
         - nginx/**/*
+      when: always
+
+build-push-webapi-image-release:
+  stage: build-image
+  extends:
+    - .build-kaniko
+  variables:
+    IMAGE_NAME: boilerplate/webapi
+    IMAGE_TAG: $CI_COMMIT_BRANCH
+    LATEST_TAG: latest
+    DOCKERFILE_PATH: "nginx/Dockerfile"
+    DOCKER_BUILD_ARGS: ""
+  script:
+    - /kaniko/executor --context ./nginx --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG $DOCKER_BUILD_ARGS
+  rules:
+    - if: $CI_COMMIT_BRANCH =~ /^release-v.*$/"
       when: always
 
 deploy-testing:
@@ -90,9 +117,9 @@ deploy-staging:
     SSH_HOST: $SSH_STAGING_HOST
     SSH_PORT: $SSH_STAGING_PORT
     API_IMAGE_NAME: boilerplate/api
-    API_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+    API_IMAGE_TAG: $CI_COMMIT_BRANCH
     WEB_API_IMAGE_NAME: boilerplate/webapi
-    WEB_API_IMAGE_TAG: latest
+    WEB_API_IMAGE_TAG: $CI_COMMIT_BRANCH
   extends:
     - .on-release
     - .deploy-environment
@@ -106,9 +133,9 @@ deploy-production:
     SSH_HOST: $SSH_PROD_HOST
     SSH_PORT: $SSH_PROD_PORT
     API_IMAGE_NAME: boilerplate/api
-    API_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+    API_IMAGE_TAG: $CI_COMMIT_BRANCH
     WEB_API_IMAGE_NAME: boilerplate/webapi
-    WEB_API_IMAGE_TAG: latest
+    WEB_API_IMAGE_TAG: $CI_COMMIT_BRANCH
   extends:
     - .on-release-manual
     - .deploy-environment
