@@ -38,7 +38,7 @@ test:
 build-push-api-image:
   stage: build-image
   extends:
-    - .can-build-kaniko
+    - .on-main
     - .build-kaniko
   variables:
     IMAGE_NAME: boilerplate/api
@@ -49,7 +49,7 @@ build-push-api-image:
 build-push-api-image-release:
   stage: build-image
   extends:
-    - .can-build-kaniko
+    - .on-release
     - .build-kaniko
   variables:
     IMAGE_NAME: boilerplate/api
@@ -79,6 +79,7 @@ build-push-webapi-image:
 build-push-webapi-image-release:
   stage: build-image
   extends:
+    - .on-release
     - .build-kaniko
   variables:
     IMAGE_NAME: boilerplate/webapi
@@ -88,9 +89,6 @@ build-push-webapi-image-release:
     DOCKER_BUILD_ARGS: ""
   script:
     - /kaniko/executor --context ./nginx --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG $DOCKER_BUILD_ARGS
-  rules:
-    - if: "$CI_COMMIT_BRANCH =~ /^release-v.*$/"
-      when: always
 
 deploy-testing:
   stage: deploy
