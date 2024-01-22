@@ -111,8 +111,8 @@ deploy-testing:
 deploy-staging:
   stage: deploy
   needs:
-    - job: build-push-api-image
-    - job: build-push-webapi-image
+    - job: build-push-api-image-release
+    - job: build-push-webapi-image-release
   variables:
     ENVIRONMENT: staging
     ENVIRONMENT_URL: https://api.staging.boilerplate.appftth.fr
