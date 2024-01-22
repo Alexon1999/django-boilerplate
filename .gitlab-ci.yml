@@ -89,7 +89,7 @@ build-push-webapi-image-release:
   script:
     - /kaniko/executor --context ./nginx --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG $DOCKER_BUILD_ARGS
   rules:
-    - if: $CI_COMMIT_BRANCH =~ /^release-v.*$/"
+    - if: "$CI_COMMIT_BRANCH =~ /^release-v.*$/"
       when: always
 
 deploy-testing:
