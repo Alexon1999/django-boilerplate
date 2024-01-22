@@ -130,8 +130,8 @@ deploy-staging:
 deploy-production:
   stage: deploy
   needs:
-    - job: build-push-api-image
-    - job: build-push-webapi-image
+    - job: build-push-api-image-release
+    - job: build-push-webapi-image-release
   variables:
     ENVIRONMENT: production
     ENVIRONMENT_URL: https://api.boilerplate.appftth.fr
