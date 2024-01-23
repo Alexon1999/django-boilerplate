@@ -1,12 +1,12 @@
 .on-main:
   rules:
     - if: "$CI_COMMIT_BRANCH == 'main'"
-      when: always
+      when: on_success
 
 .on-release:
   rules:
     - if: "$CI_COMMIT_BRANCH =~ /^release-v.*$/"
-      when: always
+      when: on_success
 
 .on-release-manual:
   rules:
@@ -16,7 +16,7 @@
 .can-build-kaniko:
   rules:
     - if: "$CI_COMMIT_BRANCH == 'main' || $CI_COMMIT_BRANCH =~ /^release-v.*$/"
-      when: always
+      when: on_success
 
 .build-kaniko:
   allow_failure: false
