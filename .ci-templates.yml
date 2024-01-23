@@ -71,7 +71,9 @@
     - chmod +x ~/.ssh/.print_ssh_password
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | DISPLAY=":0.0" SSH_ASKPASS=~/.ssh/.print_ssh_password setsid ssh-add - > /dev/null
-    - ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts || (echo "Error: Could not reach $SSH_HOST. SSH commands will fail." && exit 1)
+    - >
+      ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
+      || (echo "Error: Could not reach $SSH_HOST. SSH commands will fail." && exit 1)
     - chmod 644 ~/.ssh/known_hosts
     - $SSH_CMD "echo 'Deploying to server'"
 
