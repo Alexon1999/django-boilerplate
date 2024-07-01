@@ -27,9 +27,9 @@ class UserForm(forms.ModelForm):
 
         update_fields = []
 
-        if self.initial.get('unite'):
-            if self.initial['unite'] != self.cleaned_data['unite']:
-                update_fields.append('unite')
+        if self.initial.get("unite"):
+            if self.initial["unite"] != self.cleaned_data["unite"]:
+                update_fields.append("unite")
 
         if new_password:  # Only set a new password if one was provided
             user.set_password(new_password)

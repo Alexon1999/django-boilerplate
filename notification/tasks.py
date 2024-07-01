@@ -72,5 +72,5 @@ def send_user_notifications():
         "notifications_new_user",
         {
             "type": "number_of_notifications",
-        }
+        },
     )

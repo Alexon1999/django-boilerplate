@@ -12,9 +12,7 @@ class NotificationCostumer(WebsocketConsumer):
         self.group_name = "test"
 
         # Join room group
-        async_to_sync(self.channel_layer.group_add)(
-            self.group_name, self.channel_name
-        )
+        async_to_sync(self.channel_layer.group_add)(self.group_name, self.channel_name)
 
         self.accept()
 
@@ -31,8 +29,7 @@ class NotificationCostumer(WebsocketConsumer):
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
-            self.group_name, {
-                "type": "notifications.number", "message": message}
+            self.group_name, {"type": "notifications.number", "message": message}
         )
 
     # Receive message from room group
