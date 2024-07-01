@@ -30,7 +30,7 @@ class JwtAuthMiddleware(BaseMiddleware):
         self.inner = inner
 
     async def __call__(self, scope, receive, send):
-       # Close old database connections to prevent usage of timed out connections
+        # Close old database connections to prevent usage of timed out connections
         close_old_connections()
 
         # Get the token
@@ -45,8 +45,7 @@ class JwtAuthMiddleware(BaseMiddleware):
             return None
         else:
             #  Then token is valid, decode it
-            decoded_data = jwt_decode(
-                token, settings.SECRET_KEY, algorithms=["HS256"])
+            decoded_data = jwt_decode(token, settings.SECRET_KEY, algorithms=["HS256"])
 
             # Get the user using ID
             scope["user"] = await get_user(validated_token=decoded_data)

@@ -12,14 +12,13 @@ class CreateNotificationView(generics.CreateAPIView):
         channel = get_channel_layer()
 
         async_to_sync(channel.group_send)(
-            "group_test",
+            "notifications_new_user",
             {
-                "type": "chat_message",
-                "message": request.data['message'],
-            }
+                "type": "number_of_notifications",
+            },
         )
 
         return response.Response(
             status=status.HTTP_201_CREATED,
-            data=request.data['message'],
+            data=request.data["message"],
         )

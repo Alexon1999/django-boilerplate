@@ -8,6 +8,8 @@ from email.mime.multipart import MIMEMultipart
 from email.utils import formataddr, make_msgid, formatdate
 from notification import services
 import smtplib
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 env = environ.Env()
 
@@ -60,4 +62,15 @@ def send_mail_test(subject, html_content, mail_receipts):
         recipient_list=mail_receipts,
         from_email=None,
         fail_silently=False,
+    )
+
+
+@shared_task
+def send_user_notifications():
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "notifications_new_user",
+        {
+            "type": "number_of_notifications",
+        }
     )

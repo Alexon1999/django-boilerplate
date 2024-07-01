@@ -25,11 +25,20 @@ class UserForm(forms.ModelForm):
         user = super().save(commit=False)
         new_password = self.cleaned_data.get("new_password")
 
+        update_fields = []
+
+        if self.initial.get('unite'):
+            if self.initial['unite'] != self.cleaned_data['unite']:
+                update_fields.append('unite')
+
         if new_password:  # Only set a new password if one was provided
             user.set_password(new_password)
 
         if commit:
             user.save()
+
+        if len(update_fields) > 0:
+            user.save(update_fields=update_fields)
 
         return user
 

@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "django_filters",
     "simple_history",
+    "notifications",
     # Local apps
     "authentication.apps.AuthenticationConfig",
     "api.apps.ApiConfig",
