@@ -10,23 +10,22 @@ from notification import tasks, models
 
 @receiver(post_save, sender=auth_models.User)
 def notification_new_user_unit(sender, **kwargs):
-    if kwargs["update_fields"]:
-        (fields_name,) = kwargs["update_fields"]
+    if kwargs['update_fields']:
+        fields_name, = kwargs['update_fields']
 
         if fields_name == "unite":
             channel_layer = get_channel_layer()
-            instance = kwargs["instance"]
-            query_user = auth_models.User.objects.filter(unite=instance.unite)
+            instance = kwargs['instance']
+            query_user = auth_models.User.objects.filter(
+                unite=instance.unite
+            )
 
             notify.send(
-                instance,
-                recipient=query_user,
-                verb="new user in your unite",
+                instance, recipient=query_user, verb="new user in your unite",
             )
 
             for user in query_user:
                 number_of_notifications = user.notifications.unread().count()
-                print("name : ", user.username)
 
                 data = {
                     "type": "notifications.number",
@@ -34,8 +33,10 @@ def notification_new_user_unit(sender, **kwargs):
                     "channel": user.username,
                 }
 
-                async_to_sync(
-                    channel_layer.group_send(
-                        f"notifications", {"type": "notifications.number"}
-                    )
+                async_to_sync(channel_layer.group_send)(
+                    f"notifications_{user.username}",
+                    {
+                        "type": "notifications.number",
+                        "number_of_notifications": user.notifications.unread().count()
+                    }
                 )

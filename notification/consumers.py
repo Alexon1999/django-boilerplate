@@ -5,36 +5,40 @@ from asgiref.sync import sync_to_async, async_to_sync
 import json
 import time
 from notification import models
+from channels.db import database_sync_to_async
 
 
-class NotificationCostumer(WebsocketConsumer):
-    def connect(self):
-        self.group_name = "test"
+class NotificationCostumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.user = self.scope['user']
+        self.group_name = f"notifications_{self.user.username}"
 
         # Join room group
-        async_to_sync(self.channel_layer.group_add)(self.group_name, self.channel_name)
+        await self.channel_layer.group_add(
+            self.group_name, self.channel_name
+        )
 
-        self.accept()
+        await self.accept()
 
-    def disconnect(self, close_code):
+    async def disconnect(self, close_code):
         # Leave room group
-        async_to_sync(self.channel_layer.group_discard)(
+        await self.channel_layer.group_discard(
             self.group_name, self.channel_name
         )
 
     # Receive message from WebSocket
-    def receive(self, text_data):
+    async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
 
-        # Send message to room group
-        async_to_sync(self.channel_layer.group_send)(
-            self.group_name, {"type": "notifications.number", "message": message}
+        await self.channel_layer.group_send(
+            self.group_name, {
+                "type": "notifications.number",
+            }
         )
 
-    # Receive message from room group
-    def notifications_number(self, event):
-        message = event["message"]
+    async def notifications_number(self, event):
+        number = event.get('number_of_notifications')
 
-        # Send message to WebSocket
-        self.send(text_data=json.dumps({"message": message}))
+        if number:
+            await self.send(text_data=json.dumps({"number_of_notifications": str(number)}))
