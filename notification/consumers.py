@@ -1,11 +1,9 @@
 # chat/consumers.py
 
 from channels.generic.websocket import AsyncWebsocketConsumer, WebsocketConsumer
-from asgiref.sync import sync_to_async, async_to_sync
-import json
-import time
-from notification import models
 from channels.db import database_sync_to_async
+from asgiref.sync import async_to_sync, sync_to_async
+import json
 
 
 class NotificationCostumer(AsyncWebsocketConsumer):
@@ -19,6 +17,15 @@ class NotificationCostumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
+        await self.channel_layer.group_send(
+            self.group_name, {
+                "type": "init",
+            }
+        )
+
+    async def init(self, event):
+        number = await database_sync_to_async(self.user.notifications.unread().count)()
+        await self.send(text_data=json.dumps({"number_of_notifications": str(number)}))
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -28,8 +35,6 @@ class NotificationCostumer(AsyncWebsocketConsumer):
 
     # Receive message from WebSocket
     async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
 
         await self.channel_layer.group_send(
             self.group_name, {

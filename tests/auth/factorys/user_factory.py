@@ -12,6 +12,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     last_name = factory.Faker("last_name")
     email = factory.Faker("email")
     password = factory.PostGenerationMethodCall("set_password", "password")
+    is_active = False
 
     @factory.post_generation
     def groups(self, create, extracted, **kwargs):
