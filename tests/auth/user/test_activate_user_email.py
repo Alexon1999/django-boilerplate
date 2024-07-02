@@ -11,8 +11,7 @@ from tests.auth.factorys import user_factory, confirmation_email_token_factory
 @pytest.fixture
 def test_data(db):
     user = user_factory.UserFactory(is_active=False)
-    token = confirmation_email_token_factory.ConfirmationEmailTokenFactory(
-        user=user)
+    token = confirmation_email_token_factory.ConfirmationEmailTokenFactory(user=user)
 
     user_activate = user_factory.UserFactory(is_active=True)
     token_activate = confirmation_email_token_factory.ConfirmationEmailTokenFactory(
@@ -59,7 +58,6 @@ class TestValidationUser:
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
         assert (
-            models.ConfirmationEmailToken.objects.filter(
-                user=user_activate).count()
+            models.ConfirmationEmailToken.objects.filter(user=user_activate).count()
             == 0
         )

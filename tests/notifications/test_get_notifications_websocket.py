@@ -21,14 +21,12 @@ def api_client():
 
 @pytest.fixture
 def test_data(db):
-    user = factorys.UserFactory(
-        username="test", is_active=True)
+    user = factorys.UserFactory(username="test", is_active=True)
     user.set_password("password")
     user.save()
 
     user_enter = factorys.UserFactory()
-    notify.send(user_enter, recipient=user,
-                verb="new user in your unite")
+    notify.send(user_enter, recipient=user, verb="new user in your unite")
 
     data_login = {
         "password": "password",
@@ -52,8 +50,8 @@ class TestValidationUser:
     @pytest.mark.asyncio
     @pytest.mark.django_db(transaction=True)
     async def test_get_notifications(self, api_client, test_data):
-        user = test_data['user']
-        token = test_data['token']
+        user = test_data["user"]
+        token = test_data["token"]
 
         api_client.force_authenticate(user)
 
@@ -68,4 +66,4 @@ class TestValidationUser:
 
         response = await communicator.receive_from()
 
-        assert json.loads(response)["number_of_notifications"] == '1'
+        assert json.loads(response)["number_of_notifications"] == "1"

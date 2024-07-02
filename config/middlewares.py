@@ -45,8 +45,7 @@ class JwtAuthMiddleware(BaseMiddleware):
             return None
         else:
             #  Then token is valid, decode it
-            decoded_data = jwt_decode(
-                token, settings.SECRET_KEY, algorithms=["HS256"])
+            decoded_data = jwt_decode(token, settings.SECRET_KEY, algorithms=["HS256"])
 
             # Get the user using ID
             scope["user"] = await get_user(validated_token=decoded_data)
