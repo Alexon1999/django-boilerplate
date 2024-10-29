@@ -20,72 +20,128 @@ test:
   extends:
     - .environment-django-ci
   script:
+    # # Run pytest with generation both HTML and Cobertura XML coverage reports, and JUnit XML test report
     # if no tests found, convert exit code 5 to 0
-    - pytest --cov=. --cov-report html --cov-report term  || [ $? -eq 5 ]
+    - pytest --cov=. --cov-report html --cov-report xml:coverage.xml --cov-report term --junitxml=report.xml || [ $? -eq 5 ]
   artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+      junit: report.xml
     paths:
       - htmlcov/
+      - coverage.xml
+      - report.xml
 
 # build and push docker image to registry
-build-push-image:
+build-push-api-image:
   stage: build-image
   extends:
+    - .on-main
     - .build-kaniko
   variables:
-    IMAGE_NAME: api
+    IMAGE_NAME: boilerplate/api
     IMAGE_TAG: $CI_COMMIT_SHORT_SHA
     DOCKERFILE_PATH: "Dockerfile"
     DOCKER_BUILD_ARGS: ""
 
-generate_schema:
-  stage: generate-client
+build-push-api-image-release:
+  stage: build-image
   extends:
     - .on-release
-    - .environment-django-ci
-  script:
-    - python manage.py spectacular --file schema.yaml
-  artifacts:
-    paths:
-      - schema.yaml
-
-# generate npm package and publish to npm registry
-generate_client_openapi:
-  stage: generate-client
-  extends:
-    - .on-release
-  image: openjdk:8-jre-alpine
-  script:
-    - wget https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar -O openapi-generator-cli.jar
-    - java -jar openapi-generator-cli.jar generate -i $SCHEMA_FILE -g typescript-axios -o $OUTPUT_DIR --additional-properties=npmName="$PACKAGE_NAME",npmVersion="$PACKAGE_VERSION"
+    - .build-kaniko
   variables:
-    PACKAGE_NAME: "@nao/client"
-    PACKAGE_VERSION: 1.0.0
-    SCHEMA_FILE: schema.yaml
-    OUTPUT_DIR: nao-client
-  needs:
-    - job: generate_schema
-      artifacts: true
-  artifacts:
-    paths:
-      - $OUTPUT_DIR/
+    IMAGE_NAME: boilerplate/api
+    IMAGE_TAG: $CI_COMMIT_BRANCH
+    DOCKERFILE_PATH: "Dockerfile"
+    DOCKER_BUILD_ARGS: ""
 
-publish-client:
-  stage: publish-client
+build-push-webapi-image:
+  stage: build-image
+  extends:
+    - .build-kaniko
+  variables:
+    IMAGE_NAME: boilerplate/webapi
+    IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+    LATEST_TAG: latest
+    DOCKERFILE_PATH: "nginx/Dockerfile"
+    DOCKER_BUILD_ARGS: ""
+  script:
+    - /kaniko/executor --context ./nginx --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG $DOCKER_BUILD_ARGS
+    - /kaniko/executor --context ./nginx --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$LATEST_TAG $DOCKER_BUILD_ARGS
+  rules:
+    - if: "$CI_COMMIT_BRANCH == 'main'"
+      changes:
+        - nginx/**/*
+      when: always
+
+build-push-webapi-image-release:
+  stage: build-image
   extends:
     - .on-release
-  image: node:18-alpine
+    - .build-kaniko
+  variables:
+    IMAGE_NAME: boilerplate/webapi
+    IMAGE_TAG: $CI_COMMIT_BRANCH
+    LATEST_TAG: latest
+    DOCKERFILE_PATH: "nginx/Dockerfile"
+    DOCKER_BUILD_ARGS: ""
   script:
-    - cd nao-client
-    - npm install
-    - npm run build
-    - npm config set registry https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/
-    - npm config set @nao:registry https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/
-    - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}">.npmrc
-    - latest_version=$(npm view @nao/client version 2>/dev/null)
-    - if [ -z "$latest_version" ]; then latest_version="1.0.0"; fi
-    - npm version --allow-same-version ${latest_version}
-    - npm version minor
-    - npm publish
+    - /kaniko/executor --context ./nginx --dockerfile $DOCKERFILE_PATH --destination $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG $DOCKER_BUILD_ARGS
+
+deploy-testing:
+  stage: deploy
   needs:
-    - job: generate_client_openapi
-      artifacts: true
+    - job: build-push-api-image
+  variables:
+    ENVIRONMENT: testing
+    ENVIRONMENT_URL: https://api.testing.boilerplate.appftth.fr
+    ENV_FILE: $ENV_TESTING
+    SSH_HOST: $SSH_TESTING_HOST
+    SSH_PORT: $SSH_TESTING_PORT
+    API_IMAGE_NAME: boilerplate/api
+    API_IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+    WEB_API_IMAGE_NAME: boilerplate/webapi
+    WEB_API_IMAGE_TAG: latest
+  extends:
+    - .on-main
+    - .deploy-environment
+
+deploy-staging:
+  stage: deploy
+  needs:
+    - job: build-push-api-image-release
+    - job: build-push-webapi-image-release
+  variables:
+    ENVIRONMENT: staging
+    ENVIRONMENT_URL: https://api.staging.boilerplate.appftth.fr
+    ENV_FILE: $ENV_STAGING
+    SSH_HOST: $SSH_STAGING_HOST
+    SSH_PORT: $SSH_STAGING_PORT
+    API_IMAGE_NAME: boilerplate/api
+    API_IMAGE_TAG: $CI_COMMIT_BRANCH
+    WEB_API_IMAGE_NAME: boilerplate/webapi
+    WEB_API_IMAGE_TAG: $CI_COMMIT_BRANCH
+  extends:
+    - .on-release
+    - .deploy-environment
+
+deploy-production:
+  stage: deploy
+  needs:
+    - job: build-push-api-image-release
+    - job: build-push-webapi-image-release
+  variables:
+    ENVIRONMENT: production
+    ENVIRONMENT_URL: https://api.boilerplate.appftth.fr
+    ENV_FILE: $ENV_PROD
+    SSH_HOST: $SSH_PROD_HOST
+    SSH_PORT: $SSH_PROD_PORT
+    API_IMAGE_NAME: boilerplate/api
+    API_IMAGE_TAG: $CI_COMMIT_BRANCH
+    WEB_API_IMAGE_NAME: boilerplate/webapi
+    WEB_API_IMAGE_TAG: $CI_COMMIT_BRANCH
+  extends:
+    - .on-release-manual
+    - .deploy-environment
